@@ -562,6 +562,12 @@ MIT
 
 ---
 
+## 🏅 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=LQF-dev/Zero-code&type=Date)](https://www.star-history.com/#LQF-dev/Zero-code&Date)
+
+---
+
 ## 更新记录
 
 ### 2026-04-30
