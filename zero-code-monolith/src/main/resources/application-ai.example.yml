@@ -44,3 +44,4 @@ context-compaction:
   token-threshold: ${ZERO_CODE_COMPACTION_TOKEN_THRESHOLD:800000}
   # 送入摘要模型的最大字符数（避免摘要请求本身超长）
   max-summary-input-chars: ${ZERO_CODE_COMPACTION_MAX_SUMMARY_CHARS:300000}
+  #11111
