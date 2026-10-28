@@ -18,7 +18,7 @@ langchain4j:
       base-url: ${ZERO_CODE_LLM_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
       api-key: ${ZERO_CODE_LLM_API_KEY:replace_with_your_api_key}
       model-name: ${ZERO_CODE_LLM_MODEL_NAME:glm-4.7}
-      timeout: 240s
+      timeout: 600s
       max-tokens: ${ZERO_CODE_LLM_STREAM_MAX_TOKENS:32768}
       log-requests: true
       log-responses: true

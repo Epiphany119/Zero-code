@@ -10,7 +10,7 @@ spring:
     password: ${ZERO_CODE_DB_PASSWORD:your_db_password}
   data:
     redis:
-      host: ${ZERO_CODE_REDIS_HOST:localhost}
+      host: ${ZERO_CODE_REDIS_HOST:127.0.0.1}
       port: ${ZERO_CODE_REDIS_PORT:6379}
       password: ${ZERO_CODE_REDIS_PASSWORD:}
       ttl: 3600

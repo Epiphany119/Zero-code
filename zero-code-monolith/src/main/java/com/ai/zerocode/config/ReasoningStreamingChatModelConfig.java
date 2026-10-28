@@ -23,9 +23,9 @@ public class ReasoningStreamingChatModelConfig {
     private String apiKey;
 
     /**
-     * 流式请求超时时间，默认 240 秒。
+     * 流式请求超时时间，默认 600 秒。
      */
-    private Duration timeout = Duration.ofSeconds(240);
+    private Duration timeout = Duration.ofSeconds(600);
 
     /**
      * 是否打印请求日志。
