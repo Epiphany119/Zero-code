@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * 静态资源访问
@@ -22,8 +25,9 @@ import java.io.File;
 @RequestMapping("/static")
 public class StaticResourceController {
 
-    // 应用生成根目录（用于浏览）
-    private static final String PREVIEW_ROOT_DIR = AppConstant.CODE_OUTPUT_ROOT_DIR;
+    // 生成预览目录，以及部署后复制的目录
+    private static final Path PREVIEW_ROOT_DIR = Paths.get(AppConstant.CODE_OUTPUT_ROOT_DIR).toAbsolutePath().normalize();
+    private static final Path DEPLOY_ROOT_DIR = Paths.get(AppConstant.CODE_DEPLOY_ROOT_DIR).toAbsolutePath().normalize();
 
     /**
      * 提供静态资源访问，支持目录重定向
@@ -34,6 +38,9 @@ public class StaticResourceController {
             @PathVariable String deployKey,
             HttpServletRequest request) {
         try {
+            if (!deployKey.matches("[A-Za-z0-9_-]+")) {
+                return ResponseEntity.badRequest().build();
+            }
             // 获取资源路径
             String resourcePath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             resourcePath = resourcePath.substring(("/static/" + deployKey).length());
@@ -45,11 +52,19 @@ public class StaticResourceController {
             }
             // 默认返回 index.html
             if (resourcePath.equals("/")) {
-                resourcePath = "/index.html";
+                resourcePath = "index.html";
+            } else if (resourcePath.startsWith("/")) {
+                resourcePath = resourcePath.substring(1);
             }
-            // 构建文件路径
-            String filePath = PREVIEW_ROOT_DIR + "/" + deployKey + resourcePath;
-            File file = new File(filePath);
+            // 部署目录优先；不存在时回退到生成目录，继续支持控制台预览
+            Path deployDir = DEPLOY_ROOT_DIR.resolve(deployKey).normalize();
+            Path previewDir = PREVIEW_ROOT_DIR.resolve(deployKey).normalize();
+            Path rootDir = Files.isDirectory(deployDir) ? deployDir : previewDir;
+            Path filePath = rootDir.resolve(resourcePath).normalize();
+            if (!filePath.startsWith(rootDir)) {
+                return ResponseEntity.badRequest().build();
+            }
+            File file = filePath.toFile();
             // 检查文件是否存在
             if (!file.exists()) {
                 return ResponseEntity.notFound().build();
@@ -57,7 +72,7 @@ public class StaticResourceController {
             // 返回文件资源
             Resource resource = new FileSystemResource(file);
             return ResponseEntity.ok()
-                    .header("Content-Type", getContentTypeWithCharset(filePath))
+                    .header("Content-Type", getContentTypeWithCharset(filePath.toString()))
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

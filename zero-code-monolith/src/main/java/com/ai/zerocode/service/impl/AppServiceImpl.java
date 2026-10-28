@@ -36,6 +36,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -87,6 +88,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
     private CacheManager cacheManager;
     @Resource
     private RedissonClient redissonClient;
+
+    @Value("${app.deploy-base-url:http://localhost:8123/api/static}")
+    private String deployBaseUrl;
 
     private final Map<ChatGenModeEnum, ChatCodeGenerationEngine> generationEngineMap =
             new EnumMap<>(ChatGenModeEnum.class);
@@ -288,7 +292,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
         boolean updateResult = this.updateById(updateApp);
         ThrowUtils.throwIf(!updateResult, ErrorCode.OPERATION_ERROR, "更新应用部署信息失败");
         // 10. 构建应用访问 URL
-        String appDeployUrl = String.format("%s/%s/", AppConstant.CODE_DEPLOY_HOST, deployKey);
+        String appDeployUrl = deployBaseUrl.replaceAll("/+$", "") + "/" + deployKey + "/";
         // 11. 异步生成截图并更新应用封面
         generateAppScreenshotAsync(appId, appDeployUrl);
         return appDeployUrl;

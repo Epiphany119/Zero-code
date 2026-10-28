@@ -18,6 +18,10 @@ spring:
     store-type: redis
     timeout: 2592000
 
+app:
+  # 本机开发默认走后端静态资源接口；部署到服务器时改为用户可访问的域名和路径
+  deploy-base-url: ${ZERO_CODE_DEPLOY_BASE_URL:http://localhost:8123/api/static}
+
 server:
   port: ${ZERO_CODE_SERVER_PORT:8123}
   servlet:
